@@ -1,8 +1,16 @@
 [package]
-name = "homer"
+name = "dns-over-tls"
 version = "0.2.0"
 authors = ["Paul Mucur <mudge@mudge.name>"]
 edition = "2018"
+description = "A lightweight DNS-over-HTTPS proxy"
+repository = "https://github.com/mudge/homer"
+license = "MIT"
+keywords = ["dns", "dns-over-https", "doh"]
+readme = "README.md"
+
+[badges]
+travis-ci = { repository = "mudge/homer" }
 
 [dependencies]
 reqwest = "0.9"
