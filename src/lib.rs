@@ -1,6 +1,8 @@
 pub use crate::args::Args;
 pub use crate::error::{BoxError, Error, Result};
 use crate::udp_server::UdpServer;
+#[cfg(target_os = "windows")]
+pub use crate::windows::start_service;
 use futures::stream::StreamExt;
 use std::net::SocketAddr;
 use tokio::net::UdpSocket;
@@ -10,6 +12,7 @@ mod args;
 mod error;
 mod udp_server;
 mod upstream;
+mod windows;
 
 static SHUTTING_DOWN_TOKEN: std::sync::Mutex<Option<CancellationToken>> = std::sync::Mutex::new(None);
 

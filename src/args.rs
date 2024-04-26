@@ -82,6 +82,11 @@ pub struct Args {
     /// Verbosity level
     #[arg(short, long, value_name = "level", value_enum, default_value = "info")]
     pub verbosity: ArgVerbosity,
+
+    /// Windows only: Run as a service
+    #[cfg(target_os = "windows")]
+    #[arg(long)]
+    pub service: bool,
 }
 
 impl Args {
