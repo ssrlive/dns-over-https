@@ -48,6 +48,6 @@ impl<'a> UdpServer<'a> {
 
     /// Reply to the given request with the given response over the server's socket.
     pub fn reply(&self, request: &Request, response: &[u8]) -> Result<usize> {
-        self.socket.send_to(response, request.src_addr).map_err(Error::Response)
+        self.socket.send_to(response, request.src_addr).map_err(Error::from)
     }
 }

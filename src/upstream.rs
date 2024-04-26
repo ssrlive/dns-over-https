@@ -31,7 +31,7 @@ impl<'a> Upstream<'a> {
 
         match response.copy_to(&mut reply_buf) {
             Ok(_) => Ok(reply_buf),
-            Err(e) => Err(Error::Read(e)),
+            Err(e) => Err(Error::from(e)),
         }
     }
 }

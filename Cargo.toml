@@ -13,10 +13,11 @@ readme = "README.md"
 travis-ci = { repository = "mudge/homer" }
 
 [dependencies]
-reqwest = "0.9"
 clap = { version = "4", features = ["derive"] }
 log = { version = "0.4", features = ["std"] }
 openssl = { version = "0.10", features = ["vendored"] }
+reqwest = "0.9"
+thiserror = "1.0"
 
 [profile.release]
 lto = true
