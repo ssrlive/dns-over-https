@@ -6,7 +6,7 @@ edition = "2018"
 description = "A lightweight DNS-over-HTTPS proxy"
 repository = "https://github.com/mudge/homer"
 license = "MIT"
-keywords = ["dns", "dns-over-https", "doh"]
+keywords = ["dns", "dns-over-tls", "dns-over-https", "doh"]
 readme = "README.md"
 
 [badges]
@@ -14,7 +14,8 @@ travis-ci = { repository = "mudge/homer" }
 
 [dependencies]
 reqwest = "0.9"
-clap = "2.32"
+clap = { version = "4", features = ["derive"] }
+log = { version = "0.4", features = ["std"] }
 openssl = { version = "0.10", features = ["vendored"] }
 
 [profile.release]

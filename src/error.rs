@@ -1,4 +1,3 @@
-use std::error;
 use std::fmt;
 use std::io;
 use std::result;
@@ -13,16 +12,6 @@ pub enum Error {
     Read(reqwest::Error),
     /// An IO error raised when sending the response back to the client.
     Response(io::Error),
-}
-
-impl error::Error for Error {
-    fn description(&self) -> &str {
-        match *self {
-            Error::Request(ref err) => err.description(),
-            Error::Read(ref err) => err.description(),
-            Error::Response(ref err) => err.description(),
-        }
-    }
 }
 
 impl fmt::Display for Error {

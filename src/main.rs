@@ -11,8 +11,7 @@ mod upstream;
 fn main() {
     let args = Args::parse();
 
-    let socket = UdpSocket::bind(&args.bind)
-        .expect("could not bind to bind address, is something already listening?");
+    let socket = UdpSocket::bind(&args.bind).expect("could not bind to bind address, is something already listening?");
 
     println!("Listening for DNS requests on {}...", &args.bind);
 
@@ -23,10 +22,7 @@ fn main() {
 
     for request in server {
         for upstream in upstreams.iter() {
-            if let Err(e) = upstream
-                .send(&request)
-                .map(|response| server.reply(&request, &response))
-            {
+            if let Err(e) = upstream.send(&request).map(|response| server.reply(&request, &response)) {
                 eprintln!("error during DNS request: {:?}", e);
                 continue;
             }
