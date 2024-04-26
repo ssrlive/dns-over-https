@@ -1,0 +1,49 @@
+name: Check
+
+on:
+  [push, pull_request]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu      # arch: x86_64, os: linux
+          - x86_64-apple-darwin           # os: darwin
+          - x86_64-pc-windows-msvc        # os: windows
+
+        include:
+          - target: x86_64-unknown-linux-gnu
+            host_os: ubuntu-latest
+          - target: x86_64-apple-darwin
+            host_os: macos-latest
+          - target: x86_64-pc-windows-msvc
+            host_os: windows-latest
+
+    runs-on: ${{ matrix.host_os }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Prepare
+      shell: bash
+      run: |
+        rustc --version
+        rustup target add ${{ matrix.target }}
+
+    - name: rustfmt
+      run: cargo fmt -- --check
+    
+    - name: clippy
+      run: cargo clippy --all-targets --all-features -- -D warnings
+      
+    - name: Build
+      shell: bash
+      run: |
+        cargo build --verbose --target ${{ matrix.target }}
+
+    - name: Run tests
+      run: cargo test --verbose --all-features

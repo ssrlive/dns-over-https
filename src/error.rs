@@ -8,9 +8,6 @@ pub enum Error {
     #[error("Reqwest error: {0}")]
     Reqwest(#[from] reqwest::Error),
 
-    #[error("BoxError {0}")]
-    BoxError(#[from] BoxError),
-
     #[error("String error: {0}")]
     String(String),
 }

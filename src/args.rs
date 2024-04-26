@@ -85,6 +85,21 @@ pub struct Args {
 }
 
 impl Args {
+    pub fn bind<T: Into<String>>(&mut self, bind: T) -> &mut Self {
+        self.bind = bind.into();
+        self
+    }
+
+    pub fn upstream_url<T: Into<String>>(&mut self, url: T) -> &mut Self {
+        self.upstream_urls.push(url.into());
+        self
+    }
+
+    pub fn verbosity(&mut self, verbosity: ArgVerbosity) -> &mut Self {
+        self.verbosity = verbosity;
+        self
+    }
+
     /// Returns the Args for the current run.
     pub fn parse() -> Args {
         <Args as clap::Parser>::parse()
@@ -92,6 +107,6 @@ impl Args {
 
     /// Return a vector of Upstreams with the given Client.
     pub fn upstreams<'a>(&'a self, client: &'a Client) -> Vec<Upstream<'a>> {
-        self.upstream_urls.iter().map(|url| Upstream::new(client, &url)).collect()
+        self.upstream_urls.iter().map(|url| Upstream::new(client, url)).collect()
     }
 }

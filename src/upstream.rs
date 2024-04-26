@@ -1,7 +1,7 @@
 use reqwest::blocking::Client;
 use reqwest::header::CONTENT_TYPE;
 
-use crate::error::{Error, Result};
+use crate::error::Result;
 use crate::udp_server::Request;
 
 /// Upstream represents a single DNS-over-HTTPS upstream service.
@@ -28,10 +28,7 @@ impl<'a> Upstream<'a> {
             .send()?;
 
         let mut reply_buf: Vec<u8> = Vec::with_capacity(512);
-
-        match response.copy_to(&mut reply_buf) {
-            Ok(_) => Ok(reply_buf),
-            Err(e) => Err(Error::from(e)),
-        }
+        response.copy_to(&mut reply_buf)?;
+        Ok(reply_buf)
     }
 }

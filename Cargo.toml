@@ -14,10 +14,11 @@ travis-ci = { repository = "mudge/homer" }
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
+dotenvy = "0.15"
+env_logger = "0.11"
 log = { version = "0.4", features = ["std"] }
-openssl = { version = "0.10", features = ["vendored"] }
 reqwest = { version = "0.12", features = ["blocking"] }
-thiserror = "1.0"
+thiserror = "1"
 
 [profile.release]
 lto = true
