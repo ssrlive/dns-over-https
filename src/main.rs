@@ -17,7 +17,7 @@ fn main() {
 
     let server = UdpServer::new(&socket);
 
-    let client = reqwest::Client::new();
+    let client = reqwest::blocking::Client::new();
     let upstreams = args.upstreams(&client);
 
     for request in server {

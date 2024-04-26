@@ -1,5 +1,5 @@
+use reqwest::blocking::Client;
 use reqwest::header::CONTENT_TYPE;
-use reqwest::Client;
 
 use crate::error::{Error, Result};
 use crate::udp_server::Request;

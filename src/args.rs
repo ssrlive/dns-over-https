@@ -1,5 +1,5 @@
 use crate::upstream::Upstream;
-use reqwest::Client;
+use reqwest::blocking::Client;
 
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, clap::ValueEnum)]
