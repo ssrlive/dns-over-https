@@ -68,7 +68,7 @@ impl std::fmt::Display for ArgVerbosity {
 }
 
 /// A lightweight DNS-over-HTTPS proxy
-#[derive(clap::Parser, Debug, Clone, PartialEq, Eq)]
+#[derive(clap::Parser, Debug, Clone, PartialEq, Eq, Default)]
 #[command(author, version, about = "A lightweight DNS-over-HTTPS proxy", long_about = None)]
 pub struct Args {
     /// Listen for DNS requests on the addresses and ports
@@ -82,16 +82,6 @@ pub struct Args {
     /// Verbosity level
     #[arg(short, long, value_name = "level", value_enum, default_value = "info")]
     pub verbosity: ArgVerbosity,
-}
-
-impl Default for Args {
-    fn default() -> Self {
-        Args {
-            bind: vec![],
-            upstream_urls: vec![],
-            verbosity: ArgVerbosity::Info,
-        }
-    }
 }
 
 impl Args {

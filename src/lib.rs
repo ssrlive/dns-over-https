@@ -43,7 +43,7 @@ pub async fn main_loop(args: &Args) -> Result<()> {
 
 /// # Safety
 ///
-/// Shutdown the client.
+/// Shutdown the proxy server.
 #[no_mangle]
 pub unsafe extern "C" fn dns_over_tls_stop() -> std::ffi::c_int {
     log::info!("Shutting down...");

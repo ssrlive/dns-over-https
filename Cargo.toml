@@ -1,10 +1,10 @@
 [package]
 name = "dns-over-tls"
 version = "0.2.0"
-authors = ["Paul Mucur <mudge@mudge.name>"]
-edition = "2018"
+authors = ["@ssrlive, Paul Mucur <mudge@mudge.name>"]
+edition = "2021"
 description = "A lightweight DNS-over-HTTPS proxy"
-repository = "https://github.com/mudge/homer"
+repository = "https://github.com/ssrlive/dns-over-tls"
 license = "MIT"
 keywords = ["dns", "dns-over-tls", "dns-over-https", "doh"]
 readme = "README.md"

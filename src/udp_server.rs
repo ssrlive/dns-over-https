@@ -4,7 +4,6 @@ use std::{
     pin::Pin,
     task::{Context, Poll},
 };
-use tokio::{io::ReadBuf, net::UdpSocket};
 
 /// UdpServer represents an infinite series of requests over UDP.
 ///
@@ -13,7 +12,7 @@ use tokio::{io::ReadBuf, net::UdpSocket};
 #[derive(Clone, Copy, Debug)]
 pub struct UdpServer<'a> {
     /// The underlying UDP socket.
-    socket: &'a UdpSocket,
+    socket: &'a tokio::net::UdpSocket,
 }
 
 /// A UDP request
@@ -30,7 +29,7 @@ impl<'a> futures::stream::Stream for UdpServer<'a> {
 
     fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
         let mut buf = [0; 512];
-        let mut read_buf = ReadBuf::new(&mut buf);
+        let mut read_buf = tokio::io::ReadBuf::new(&mut buf);
 
         match futures::ready!(self.socket.poll_recv_from(cx, &mut read_buf)) {
             Ok(src_addr) => Poll::Ready(Some(Ok(Request {
@@ -44,7 +43,7 @@ impl<'a> futures::stream::Stream for UdpServer<'a> {
 
 impl<'a> UdpServer<'a> {
     /// Returns a new `UdpServer` wrapping the given socket.
-    pub fn new(socket: &'a UdpSocket) -> UdpServer {
+    pub fn new(socket: &'a tokio::net::UdpSocket) -> UdpServer {
         UdpServer { socket }
     }
 
