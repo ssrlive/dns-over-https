@@ -1,5 +1,5 @@
-use reqwest::blocking::Client;
 use reqwest::header::CONTENT_TYPE;
+use reqwest::Client;
 
 use crate::error::Result;
 use crate::udp_server::Request;
@@ -19,16 +19,15 @@ impl<'a> Upstream<'a> {
     }
 
     /// Send a given request to the upstream service and return the raw response.
-    pub fn send(&self, request: &Request) -> Result<Vec<u8>> {
-        let mut response = self
+    pub async fn send(&self, request: &Request) -> Result<Vec<u8>> {
+        let response = self
             .client
             .post(self.url)
             .header(CONTENT_TYPE, "application/dns-message")
             .body(request.body.to_owned())
-            .send()?;
+            .send()
+            .await?;
 
-        let mut reply_buf: Vec<u8> = Vec::with_capacity(512);
-        response.copy_to(&mut reply_buf)?;
-        Ok(reply_buf)
+        Ok(response.bytes().await?.to_vec())
     }
 }

@@ -1,5 +1,4 @@
 use crate::upstream::Upstream;
-use reqwest::blocking::Client;
 use std::net::SocketAddr;
 
 #[repr(C)]
@@ -117,7 +116,7 @@ impl Args {
     }
 
     /// Return a vector of Upstreams with the given Client.
-    pub fn upstreams<'a>(&'a self, client: &'a Client) -> Vec<Upstream<'a>> {
+    pub fn upstreams<'a>(&'a self, client: &'a reqwest::Client) -> Vec<Upstream<'a>> {
         self.upstream_urls.iter().map(|url| Upstream::new(client, url)).collect()
     }
 }

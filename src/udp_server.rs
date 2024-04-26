@@ -1,6 +1,10 @@
-use std::net::{SocketAddr, UdpSocket};
-
 use crate::error::{Error, Result};
+use std::{
+    net::SocketAddr,
+    pin::Pin,
+    task::{Context, Poll},
+};
+use tokio::{io::ReadBuf, net::UdpSocket};
 
 /// UdpServer represents an infinite series of requests over UDP.
 ///
@@ -21,21 +25,19 @@ pub struct Request {
     src_addr: SocketAddr,
 }
 
-impl<'a> Iterator for UdpServer<'a> {
-    type Item = Request;
+impl<'a> futures::stream::Stream for UdpServer<'a> {
+    type Item = std::io::Result<Request>;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        loop {
-            let mut buf = [0; 512];
+    fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        let mut buf = [0; 512];
+        let mut read_buf = ReadBuf::new(&mut buf);
 
-            if let Ok((number_of_bytes, src_addr)) = self.socket.recv_from(&mut buf) {
-                let filled_buf = &mut buf[..number_of_bytes];
-
-                return Some(Request {
-                    body: filled_buf.to_vec(),
-                    src_addr,
-                });
-            }
+        match futures::ready!(self.socket.poll_recv_from(cx, &mut read_buf)) {
+            Ok(src_addr) => Poll::Ready(Some(Ok(Request {
+                body: read_buf.filled().to_vec(),
+                src_addr,
+            }))),
+            Err(e) => Poll::Ready(Some(Err(e))),
         }
     }
 }
@@ -47,7 +49,7 @@ impl<'a> UdpServer<'a> {
     }
 
     /// Reply to the given request with the given response over the server's socket.
-    pub fn reply(&self, request: &Request, response: &[u8]) -> Result<usize> {
-        self.socket.send_to(response, request.src_addr).map_err(Error::from)
+    pub async fn reply(&self, request: &Request, response: &[u8]) -> Result<usize> {
+        self.socket.send_to(response, request.src_addr).await.map_err(Error::from)
     }
 }

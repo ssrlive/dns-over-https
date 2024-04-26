@@ -1,37 +1,49 @@
 pub use crate::args::Args;
 pub use crate::error::{BoxError, Error, Result};
 use crate::udp_server::UdpServer;
-use std::net::{SocketAddr, UdpSocket};
+use futures::stream::StreamExt;
+use std::net::SocketAddr;
+use tokio::net::UdpSocket;
 
 mod args;
 mod error;
 mod udp_server;
 mod upstream;
 
-pub fn main_loop(args: &Args) -> Result<()> {
+pub async fn main_loop(args: &Args) -> Result<()> {
     for bind in args.bind.clone() {
-        _main_loop(bind, &args)?;
+        _main_loop(bind, args).await?;
     }
     Ok(())
 }
 
-pub fn _main_loop(bind: SocketAddr, args: &Args) -> Result<()> {
+async fn _main_loop(bind: SocketAddr, args: &Args) -> Result<()> {
     log::info!("Listening for DNS requests on {}...", bind);
 
-    let socket = UdpSocket::bind(bind)?;
+    let socket = UdpSocket::bind(bind).await?;
 
-    let server = UdpServer::new(&socket);
+    let mut server = UdpServer::new(&socket);
 
-    let client = reqwest::blocking::Client::new();
+    let client = reqwest::Client::new();
     let upstreams = args.upstreams(&client);
 
-    for request in server {
-        for upstream in upstreams.iter() {
-            if let Err(e) = upstream.send(&request).map(|response| server.reply(&request, &response)) {
-                log::error!("error during DNS request: {:?}", e);
-                continue;
+    while let Some(request) = server.next().await {
+        match request {
+            Ok(request) => {
+                for upstream in upstreams.iter() {
+                    match upstream.send(&request).await {
+                        Ok(response) => {
+                            server.reply(&request, &response).await?;
+                            break;
+                        }
+                        Err(e) => {
+                            log::error!("error during sending request: {:?}", e);
+                            continue;
+                        }
+                    }
+                }
             }
-            break;
+            Err(e) => log::trace!("error during DNS request: {:?}", e),
         }
     }
     Ok(())
