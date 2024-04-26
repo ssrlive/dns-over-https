@@ -1,5 +1,6 @@
 use crate::upstream::Upstream;
 use reqwest::blocking::Client;
+use std::net::SocketAddr;
 
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, clap::ValueEnum)]
@@ -68,12 +69,12 @@ impl std::fmt::Display for ArgVerbosity {
 }
 
 /// A lightweight DNS-over-HTTPS proxy
-#[derive(clap::Parser, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(clap::Parser, Debug, Clone, PartialEq, Eq)]
 #[command(author, version, about = "A lightweight DNS-over-HTTPS proxy", long_about = None)]
 pub struct Args {
-    /// Listen for DNS requests on this address and port
+    /// Listen for DNS requests on the addresses and ports
     #[arg(short, long, value_name = "IP:port", default_value = "127.0.0.1:53")]
-    pub bind: String,
+    pub bind: Vec<SocketAddr>,
 
     /// URL(s) of upstream DNS-over-HTTPS service
     #[arg(short, long, value_name = "URL", default_value = "https://1.1.1.1/dns-query")]
@@ -84,9 +85,19 @@ pub struct Args {
     pub verbosity: ArgVerbosity,
 }
 
+impl Default for Args {
+    fn default() -> Self {
+        Args {
+            bind: vec![],
+            upstream_urls: vec![],
+            verbosity: ArgVerbosity::Info,
+        }
+    }
+}
+
 impl Args {
-    pub fn bind<T: Into<String>>(&mut self, bind: T) -> &mut Self {
-        self.bind = bind.into();
+    pub fn bind<T: Into<SocketAddr>>(&mut self, bind: T) -> &mut Self {
+        self.bind.push(bind.into());
         self
     }
 

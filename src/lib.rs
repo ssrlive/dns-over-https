@@ -1,7 +1,7 @@
 pub use crate::args::Args;
 pub use crate::error::{BoxError, Error, Result};
 use crate::udp_server::UdpServer;
-use std::net::UdpSocket;
+use std::net::{SocketAddr, UdpSocket};
 
 mod args;
 mod error;
@@ -9,9 +9,16 @@ mod udp_server;
 mod upstream;
 
 pub fn main_loop(args: &Args) -> Result<()> {
-    log::info!("Listening for DNS requests on {}...", &args.bind);
+    for bind in args.bind.clone() {
+        _main_loop(bind, &args)?;
+    }
+    Ok(())
+}
 
-    let socket = UdpSocket::bind(&args.bind)?;
+pub fn _main_loop(bind: SocketAddr, args: &Args) -> Result<()> {
+    log::info!("Listening for DNS requests on {}...", bind);
+
+    let socket = UdpSocket::bind(bind)?;
 
     let server = UdpServer::new(&socket);
 
