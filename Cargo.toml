@@ -9,8 +9,9 @@ license = "MIT"
 keywords = ["dns", "dns-over-tls", "dns-over-https", "doh"]
 readme = "README.md"
 
-[badges]
-travis-ci = { repository = "mudge/homer" }
+[[bin]]
+name = "dns-over-tls"
+path = "src/bin/main.rs"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
