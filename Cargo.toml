@@ -1,16 +1,16 @@
 [package]
-name = "dns-over-tls"
+name = "dns-over-https"
 version = "0.2.0"
 authors = ["@ssrlive, Paul Mucur <mudge@mudge.name>"]
 edition = "2021"
 description = "A lightweight DNS-over-HTTPS proxy"
-repository = "https://github.com/ssrlive/dns-over-tls"
+repository = "https://github.com/ssrlive/dns-over-https"
 license = "MIT"
-keywords = ["dns", "dns-over-tls", "dns-over-https", "doh"]
+keywords = ["dns", "dns-over-https", "dns-over-https", "doh"]
 readme = "README.md"
 
 [[bin]]
-name = "dns-over-tls"
+name = "dns-over-https"
 path = "src/bin/main.rs"
 
 [dependencies]

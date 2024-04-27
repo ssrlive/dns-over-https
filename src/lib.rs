@@ -20,7 +20,7 @@ pub async fn main_loop(args: &Args) -> Result<()> {
     let shutdown_token = CancellationToken::new();
     if let Ok(mut lock) = SHUTTING_DOWN_TOKEN.lock() {
         if lock.is_some() {
-            return Err("dns-over-tls already started".into());
+            return Err("dns-over-https already started".into());
         }
         *lock = Some(shutdown_token.clone());
     }
@@ -48,7 +48,7 @@ pub async fn main_loop(args: &Args) -> Result<()> {
 ///
 /// Shutdown the proxy server.
 #[no_mangle]
-pub unsafe extern "C" fn dns_over_tls_stop() -> std::ffi::c_int {
+pub unsafe extern "C" fn dns_over_https_stop() -> std::ffi::c_int {
     log::info!("Shutting down...");
     if let Ok(mut token) = SHUTTING_DOWN_TOKEN.lock() {
         if let Some(token) = token.take() {

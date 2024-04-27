@@ -5,7 +5,7 @@ windows_service::define_windows_service!(ffi_service_main, my_service_main);
 pub fn start_service() -> Result<(), windows_service::Error> {
     // Register generated `ffi_service_main` with the system and start the service,
     // blocking this thread until the service is stopped.
-    windows_service::service_dispatcher::start("dns-over-tls", ffi_service_main)?;
+    windows_service::service_dispatcher::start("dns-over-https", ffi_service_main)?;
     Ok(())
 }
 
@@ -26,7 +26,7 @@ fn run_service(_arguments: Vec<std::ffi::OsString>) -> Result<(), crate::BoxErro
         match control_event {
             ServiceControl::Stop => {
                 // Handle stop event and return control back to the system.
-                unsafe { crate::dns_over_tls_stop() };
+                unsafe { crate::dns_over_https_stop() };
                 ServiceControlHandlerResult::NoError
             }
             // All services must accept Interrogate even if it's a no-op.
@@ -36,7 +36,7 @@ fn run_service(_arguments: Vec<std::ffi::OsString>) -> Result<(), crate::BoxErro
     };
 
     // Register system service event handler
-    let status_handle = service_control_handler::register("dns-over-tls", event_handler)?;
+    let status_handle = service_control_handler::register("dns-over-https", event_handler)?;
 
     let mut next_status = windows_service::service::ServiceStatus {
         // Should match the one from system service registry

@@ -1,11 +1,11 @@
-fn main() -> Result<(), dns_over_tls::BoxError> {
+fn main() -> Result<(), dns_over_https::BoxError> {
     dotenvy::dotenv().ok();
 
-    let args = dns_over_tls::Args::parse();
+    let args = dns_over_https::Args::parse();
 
     #[cfg(target_os = "windows")]
     if args.service {
-        dns_over_tls::start_service()?;
+        dns_over_https::start_service()?;
         return Ok(());
     }
 
@@ -14,14 +14,14 @@ fn main() -> Result<(), dns_over_tls::BoxError> {
 
     let join = ctrlc2::set_handler(|| {
         log::info!("Ctrl-C received, exiting...");
-        unsafe { dns_over_tls::dns_over_tls_stop() };
+        unsafe { dns_over_https::dns_over_https_stop() };
         true
     })?;
 
     let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build()?;
     rt.block_on(async {
-        dns_over_tls::main_loop(&args).await?;
-        Ok::<(), dns_over_tls::Error>(())
+        dns_over_https::main_loop(&args).await?;
+        Ok::<(), dns_over_https::Error>(())
     })?;
 
     join.join().expect("Couldn't join on the associated thread");
