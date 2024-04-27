@@ -1,5 +1,11 @@
 # DNS-over-HTTPS
 
+[![Crates.io](https://img.shields.io/crates/v/dns-over-https.svg)](https://crates.io/crates/dns-over-https)
+![dns-over-https](https://docs.rs/dns-over-https/badge.svg)
+[![Documentation](https://img.shields.io/badge/docs-release-brightgreen.svg?style=flat)](https://docs.rs/dns-over-https)
+[![Download](https://img.shields.io/crates/d/dns-over-https.svg)](https://crates.io/crates/dns-over-https)
+[![License](https://img.shields.io/crates/l/dns-over-https.svg?style=flat)](https://github.com/ssrlive/dns-over-https/blob/master/LICENSE)
+
 A lightweight DNS-over-HTTPS ("DOH") proxy written in Rust.
 
 DNS-over-HTTPS is a lightweight proxy that will securely forward any requests to a DNS-over-HTTPS resolver such as [Cloudflare](https://developers.cloudflare.com/1.1.1.1/dns-over-https/).
@@ -44,7 +50,7 @@ Open a `powershell` terminal with administrative privileges and input command `N
 
 Start the service: Input command `services` from start menu, open `Services` window, start the service `dns-over-https`.
 
-![image](https://github.com/ssrlive/dns-over-https/assets/30760636/0c578370-e74e-43e5-9bdd-41701bd12d44)
+![image](https://github.com/ssrlive/dns-over-https/assets/30760636/a66a038d-cc26-4b97-a762-977ff806e969)
 
 Modify the DNS server address in the network adapter settings to `127.0.0.1`(IPv4) and `::1`(IPv6).
 
@@ -56,15 +62,15 @@ Done.
 
 To use DNS-over-HTTPS to encrypt your DNS requests on a Pi-Hole, download and install the latest [release](https://github.com/ssrlive/dns-over-https/releases):
 
-```console
-pi@raspberrypi:~ $ wget https://github.com/ssrlive/dns-over-https/releases/download/v0.2.0/dns-over-https-v0.2.0-arm-unknown-linux-gnueabihf.tar.gz
-pi@raspberrypi:~ $ tar xzf dns-over-https-v0.2.0-arm-unknown-linux-gnueabihf.tar.gz
+```bash
+pi@raspberrypi:~ $ wget https://github.com/ssrlive/dns-over-https/releases/latest/download/dns-over-https-arm-unknown-linux-gnueabihf.zip
+pi@raspberrypi:~ $ unzip dns-over-https-arm-unknown-linux-gnueabihf.zip
 pi@raspberrypi:~ $ sudo mv dns-over-https /usr/local/bin/
 ```
 
 You can confirm dns-over-https is working properly by asking for the current version:
 
-```console
+```bash
 pi@raspberrypi:~ $ dns-over-https --version
 dns-over-https 0.2.0
 ```
@@ -73,13 +79,13 @@ You can then configure dns-over-https to run as a Systemd service that listens o
 
 First, create a system user for dns-over-https:
 
-```console
+```bash
 pi@raspberrypi:~ $ sudo adduser --system --no-create-home dns-over-https
 ```
 
 Then write out a Systemd unit file:
 
-```console
+```bash
 pi@raspberrypi:~ $ sudo tee /lib/systemd/system/dns-over-https.service <<EOF
 [Unit]
 Description=dns-over-https
@@ -100,7 +106,7 @@ EOF
 
 You can now start up dns-over-https and check it is running:
 
-```console
+```bash
 pi@raspberrypi:~ $ sudo systemctl enable dns-over-https
 pi@raspberrypi:~ $ sudo systemctl start dns-over-https
 pi@raspberrypi:~ $ sudo systemctl status dns-over-https
