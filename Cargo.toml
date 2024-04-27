@@ -20,7 +20,9 @@ dotenvy = "0.15"
 env_logger = "0.11"
 futures = "0.3"
 log = { version = "0.4", features = ["std"] }
-reqwest = { version = "0.12", features = [] }
+reqwest = { version = "0.12", default-features = false, features = [
+    "rustls-tls",
+] }
 thiserror = "1"
 tokio = { version = "1", features = ["full"] }
 tokio-util = "0.7"
