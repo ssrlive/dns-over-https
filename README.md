@@ -14,15 +14,43 @@ Download the latest binary for your architecture from the [releases page](https:
 ## Usage
 
 ```
-Usage: dns-over-https.exe [OPTIONS]
+Usage: dns-over-https [OPTIONS]
 
 Options:
   -b, --bind <IP:port>       Listen for DNS requests on the addresses and ports [default: 127.0.0.1:53]
   -u, --upstream-urls <URL>  URL(s) of upstream DNS-over-HTTPS service [default: https://1.1.1.1/dns-query]
   -v, --verbosity <level>    Verbosity level [default: info] [possible values: off, error, warn, info, debug, trace]
+      --service              Windows only: Run as a service
   -h, --help                 Print help
   -V, --version              Print version
 ```
+
+### Running on Windows
+
+To use DNS-over-HTTPS to encrypt your DNS requests on Windows, download and install the latest [release](https://github.com/ssrlive/dns-over-https/releases).
+
+Or you can install it using `cargo`, assuming you have `Rust` installed:
+
+```bash
+cargo install dns-over-https
+```
+The binary will be installed in `C:\Users\<username>\.cargo\bin\dns-over-https.exe`.
+
+Open a `powershell` terminal with administrative privileges and input command `New-Service` to create a new service,
+- Name: `dns-over-https`
+- BinaryPathName: `C:\Users\<username>\.cargo\bin\dns-over-https.exe -b 127.0.0.1:53 -b [::1]:53 --service`
+
+![image](https://github.com/ssrlive/dns-over-https/assets/30760636/284e1063-179b-4ee9-8f85-1124769eb318)
+
+Start the service: Input command `services` from start menu, open `Services` window, start the service `dns-over-https`.
+
+![image](https://github.com/ssrlive/dns-over-https/assets/30760636/0c578370-e74e-43e5-9bdd-41701bd12d44)
+
+Modify the DNS server address in the network adapter settings to `127.0.0.1`(IPv4) and `::1`(IPv6).
+
+![image](https://github.com/ssrlive/dns-over-https/assets/30760636/25505389-ff61-44e7-88b1-6117eb36c66c)
+
+Done.
 
 ### Running on a Pi-Hole
 
