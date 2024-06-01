@@ -9,11 +9,15 @@ license = "MIT"
 keywords = ["dns", "dns-over-https", "dns-over-tls", "doh"]
 readme = "README.md"
 
+[lib]
+crate-type = ["staticlib", "cdylib", "rlib"]
+
 [[bin]]
 name = "dns-over-https"
 path = "src/bin/main.rs"
 
 [dependencies]
+chrono = "0.4"
 clap = { version = "4", features = ["derive"] }
 ctrlc2 = { version = "3", features = ["tokio", "termination"] }
 dotenvy = "0.15"
@@ -26,6 +30,10 @@ reqwest = { version = "0.12", default-features = false, features = [
 thiserror = "1"
 tokio = { version = "1", features = ["full"] }
 tokio-util = "0.7"
+
+[target.'cfg(target_os="android")'.dependencies]
+android_logger = "0.13"
+jni = { version = "0.21", default-features = false }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows-service = "0.7"

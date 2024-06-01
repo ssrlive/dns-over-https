@@ -1,18 +1,92 @@
-pub use crate::args::Args;
+pub use crate::args::{ArgVerbosity, Args};
 pub use crate::error::{BoxError, Error, Result};
 use crate::udp_server::UdpServer;
 #[cfg(target_os = "windows")]
 pub use crate::windows::start_service;
 use futures::stream::StreamExt;
+use std::ffi::{c_char, c_int, CStr};
 use std::net::SocketAddr;
 use tokio::net::UdpSocket;
 use tokio_util::sync::CancellationToken;
 
 mod args;
+mod dump_logger;
 mod error;
 mod udp_server;
 mod upstream;
 mod windows;
+
+/// # Safety
+/// Run the proxy server of DNS-over-HTTPS, this function will block the current thread.
+/// The parameters are:
+/// - `bind1`: The first bind address (IPv4 or IPv6) for the proxy server, e.g. `0.0.0.0:53`.
+/// - `bind2`: The second bind address (IPv4 or IPv6) for the proxy server. e.g. `[::]:53`.
+/// - `upstream_url`: The URL of the upstream service, e.g. `https://1.1.1.1/dns-query`.
+/// - `verbosity`: The verbosity level of the log, e.g. `info`.
+#[no_mangle]
+pub unsafe extern "C" fn dns_over_https_run(
+    bind1: *const c_char,
+    bind2: *const c_char,
+    upstream_url: *const c_char,
+    verbosity: ArgVerbosity,
+) -> c_int {
+    let main_1_loop = async move {
+        log::set_max_level(verbosity.into());
+
+        #[cfg(target_os = "android")]
+        {
+            let filter_str = &format!("off,dns_over_https={verbosity}");
+            let filter = android_logger::FilterBuilder::new().parse(filter_str).build();
+            android_logger::init_once(
+                android_logger::Config::default()
+                    .with_tag("dns_over_https")
+                    .with_max_level(log::LevelFilter::Trace)
+                    .with_filter(filter),
+            );
+        }
+
+        #[cfg(not(target_os = "android"))]
+        if let Err(err) = log::set_boxed_logger(Box::<crate::dump_logger::DumpLogger>::default()) {
+            log::warn!("set logger error: {}", err);
+        }
+
+        log::info!("Starting dns_over_https...");
+
+        let mut args = Args::default();
+        if !bind1.is_null() {
+            args.bind(CStr::from_ptr(bind1).to_str()?.parse::<SocketAddr>()?);
+        }
+        if !bind2.is_null() {
+            args.bind(CStr::from_ptr(bind2).to_str()?.parse::<SocketAddr>()?);
+        }
+        if args.bind.is_empty() {
+            args.bind("127.0.0.1:53".parse::<SocketAddr>()?);
+            args.bind("[::1]:53".parse::<SocketAddr>()?);
+        }
+        let url = if upstream_url.is_null() {
+            "https://1.1.1.1/dns-query".to_string()
+        } else {
+            CStr::from_ptr(upstream_url).to_str()?.to_string()
+        };
+        args.upstream_url(url);
+        args.verbosity(verbosity);
+        if let Err(err) = main_loop(&args).await {
+            log::error!("main loop error: {}", err);
+            return Err(err);
+        }
+        Ok(())
+    };
+
+    let exit_code = match tokio::runtime::Builder::new_multi_thread().enable_all().build() {
+        Err(_e) => -3,
+        Ok(rt) => match rt.block_on(main_1_loop) {
+            Ok(_) => 0,
+            Err(_e) => -4,
+        },
+    };
+
+    exit_code
+}
 
 static SHUTTING_DOWN_TOKEN: std::sync::Mutex<Option<CancellationToken>> = std::sync::Mutex::new(None);
 

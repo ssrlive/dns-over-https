@@ -2,6 +2,12 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
+    #[error("UTF-8 error: {0}")]
+    Utf8Error(#[from] std::str::Utf8Error),
+
+    #[error("AddrParseError: {0}")]
+    AddrParseError(#[from] std::net::AddrParseError),
+
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
 
